@@ -123,7 +123,6 @@ void handle_socket(int socket_fd){
 				printf("NULL\n");
 				recv(socket_fd,buffer,BUFSIZE,0);
 			}
-			printf("%s\n",buffer);
 			if((tmp=strstr(buffer,"filename="))==NULL)
 				printf("NULL AGAIN\n");
 			tmp+=10;
@@ -132,20 +131,28 @@ void handle_socket(int socket_fd){
 			for(l=0;*tmp!='\"';l++,tmp++)
 				name[l]=*tmp;
 			name[l]=0;
-			printf("%s\n",name);
-			if((file_fd=open(name,O_WRONLY|O_CREAT|O_TRUNC,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH))==-1)
+			if((file_fd=open(name,O_WRONLY|O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH))==-1)
 				printf("Failed to open\n");
 			tmp=strstr(buffer,boundry);
 			tmpp=strstr(tmp,"\r\n\r\n")+4;
-			tmp=strstr(tmpp,end);
-			l=tmp-tmpp;
-			printf("%d\n",l);
-			write(file_fd,tmpp,l);
+			while((tmp=strstr(tmpp,end))==NULL){
+				l=&buffer[BUFSIZE-1]-tmpp+1;
+				printf("%d\n",l);
+				write(file_fd,tmpp,l);
+				write(1,tmpp,l);
+				recv(socket_fd,buffer,BUFSIZE,0);
+				tmpp=buffer;
+			}
+			l=tmp-tmpp-2;
+			printf("\n\n%s\n\n",buffer);
+			write(file_fd,buffer,l);
+			write(1,tmpp,l);
 			close(file_fd);
 		//	sprintf(buffer,"HTTP/1.0 200 OK\r\n");
 		//	write(socket_fd,buffer,strlen(buffer));
 //		*/
 		}	/*POST END*/
+		recv(socket_fd,buffer,BUFSIZE,0);
 	}
 exit(0) ;
 }
