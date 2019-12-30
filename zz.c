@@ -60,8 +60,10 @@ int main(int argc, const char * argv[]) {
             printf("      Length: %d bytes\n",header->caplen);
             local_tv_sec = header->ts.tv_sec;
             ltime = localtime(&local_tv_sec);
-            strftime(timestr, sizeof timestr, "%H:%M:%S", ltime);
-            printf("\tTime: %s\n", timestr);
+            //strftime(timestr, sizeof timestr, "%H:%M:%S", ltime);
+            //printf("\tTime: %s\n", timestr);
+            printf("\tTime: %d-%d-%d %d:%d:%d\n",ltime->tm_year+1900,ltime->tm_mon,ltime->tm_mday\
+                                            ,ltime->tm_hour,ltime->tm_min,ltime->tm_sec);
             head = (struct myheader *)content;
             type_packet = ntohs(head->type);
             printf("\ttype: %d\n",type_packet);
